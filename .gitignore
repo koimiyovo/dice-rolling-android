@@ -33,3 +33,5 @@ out/
 
 # Google Services (if used)
 # google-services.json
+# Claude Code local context (not versioned)
+CLAUDE.local.md
