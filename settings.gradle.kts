@@ -23,4 +23,8 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Dice rolling"
+include(":domain")
+include(":application")
+include(":infrastructure")
+include(":presentation")
 include(":app")
