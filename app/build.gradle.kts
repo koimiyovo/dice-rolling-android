@@ -37,6 +37,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":domain"))
+    implementation(project(":application"))
+    implementation(project(":infrastructure"))
+    implementation(project(":presentation"))
+
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.runtime)
@@ -45,10 +50,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)
     testImplementation(libs.assertj.core)
