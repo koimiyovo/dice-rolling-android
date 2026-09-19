@@ -15,4 +15,7 @@ kotlin {
 
 dependencies {
     implementation(project(":domain"))
+
+    testImplementation(libs.junit)
+    testImplementation(libs.assertj.core)
 }
