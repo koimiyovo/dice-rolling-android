@@ -1,9 +1,8 @@
 package com.kyovo.dicerolling.presentation.ui.dice
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.junit.Test
-import kotlin.math.abs
 import kotlin.math.sqrt
 
 class RoundedDieMeshTest {
@@ -17,16 +16,18 @@ class RoundedDieMeshTest {
 
     @Test
     fun `every face has a grid of the same size`() {
+        val gridSize = 2 * (arcSteps + 1)
+
         for (face in mesh.faces) {
-            assertEquals(2 * (arcSteps + 1), face.grid.size)
-            assertTrue(face.grid.all { it.size == face.grid.size })
+            assertThat(face.grid).hasSize(gridSize)
+            assertThat(face.grid).allSatisfy { row -> assertThat(row).hasSize(gridSize) }
         }
     }
 
     @Test
     fun `every normal is a unit vector`() {
         for (vertex in vertices) {
-            assertEquals(1f, sqrt(vertex.normal.dot(vertex.normal)), delta)
+            assertThat(sqrt(vertex.normal.dot(vertex.normal))).isCloseTo(1f, within(delta))
         }
     }
 
@@ -34,7 +35,10 @@ class RoundedDieMeshTest {
     fun `the die never goes past the unit cube`() {
         for (vertex in vertices) {
             val p = vertex.position
-            assertTrue(abs(p.x) <= 1f + delta && abs(p.y) <= 1f + delta && abs(p.z) <= 1f + delta)
+
+            assertThat(listOf(p.x, p.y, p.z)).allSatisfy { coordinate ->
+                assertThat(coordinate).isBetween(-1f - delta, 1f + delta)
+            }
         }
     }
 
@@ -43,8 +47,8 @@ class RoundedDieMeshTest {
         for (face in mesh.faces) {
             val flat = face.grid[arcSteps][arcSteps]
 
-            assertEquals(1f, flat.position.dot(face.face.normal), delta)
-            assertEquals(1f, flat.normal.dot(face.face.normal), delta)
+            assertThat(flat.position.dot(face.face.normal)).isCloseTo(1f, within(delta))
+            assertThat(flat.normal.dot(face.face.normal)).isCloseTo(1f, within(delta))
         }
     }
 
@@ -53,7 +57,7 @@ class RoundedDieMeshTest {
         val sharpCorner = sqrt(3f)
         val farthest = vertices.maxOf { sqrt(it.position.dot(it.position)) }
 
-        assertTrue(farthest < sharpCorner - 0.1f)
+        assertThat(farthest).isLessThan(sharpCorner - 0.1f)
     }
 
     @Test
@@ -65,7 +69,7 @@ class RoundedDieMeshTest {
             val core = Vector3(p.x.coerceIn(-inner, inner), p.y.coerceIn(-inner, inner), p.z.coerceIn(-inner, inner))
             val gap = p + core * -1f
 
-            assertEquals(radius, sqrt(gap.dot(gap)), delta)
+            assertThat(sqrt(gap.dot(gap))).isCloseTo(radius, within(delta))
         }
     }
 }

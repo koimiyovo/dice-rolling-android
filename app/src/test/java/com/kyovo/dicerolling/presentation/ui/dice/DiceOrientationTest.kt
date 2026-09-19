@@ -1,17 +1,18 @@
 package com.kyovo.dicerolling.presentation.ui.dice
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.junit.Test
+import kotlin.math.abs
 
 class DiceOrientationTest {
 
     private val delta = 1e-4f
 
-    private fun assertVectorEquals(expected: Vector3, actual: Vector3) {
-        assertEquals(expected.x, actual.x, delta)
-        assertEquals(expected.y, actual.y, delta)
-        assertEquals(expected.z, actual.z, delta)
+    private fun assertVectorEquals(actual: Vector3, expected: Vector3) {
+        assertThat(actual.x).isCloseTo(expected.x, within(delta))
+        assertThat(actual.y).isCloseTo(expected.y, within(delta))
+        assertThat(actual.z).isCloseTo(expected.z, within(delta))
     }
 
     @Test
@@ -19,16 +20,16 @@ class DiceOrientationTest {
         for (face in DieFace.entries) {
             val rotate = face.facing::rotate
 
-            assertVectorEquals(Vector3(0f, 0f, 1f), rotate(face.normal))
-            assertVectorEquals(Vector3(1f, 0f, 0f), rotate(face.u))
-            assertVectorEquals(Vector3(0f, 1f, 0f), rotate(face.v))
+            assertVectorEquals(rotate(face.normal), Vector3(0f, 0f, 1f))
+            assertVectorEquals(rotate(face.u), Vector3(1f, 0f, 0f))
+            assertVectorEquals(rotate(face.v), Vector3(0f, 1f, 0f))
         }
     }
 
     @Test
     fun `local axes of every face are right-handed`() {
         for (face in DieFace.entries) {
-            assertVectorEquals(face.normal, face.u.cross(face.v))
+            assertVectorEquals(face.u.cross(face.v), face.normal)
         }
     }
 
@@ -36,14 +37,15 @@ class DiceOrientationTest {
     fun `opposite faces add up to seven`() {
         for (face in DieFace.entries) {
             val opposite = DieFace.entries.first { it.normal.dot(face.normal) < -0.5f }
-            assertEquals(7, face.value + opposite.value)
+
+            assertThat(face.value + opposite.value).isEqualTo(7)
         }
     }
 
     @Test
     fun `each face has as many pips as its value`() {
         for (face in DieFace.entries) {
-            assertEquals(face.value, face.pips.size)
+            assertThat(face.pips).hasSize(face.value)
         }
     }
 
@@ -54,7 +56,7 @@ class DiceOrientationTest {
                 DiceOrientation.resting(face).rotate(it.normal).z
             }
 
-            assertEquals(face, facingCamera)
+            assertThat(facingCamera).isEqualTo(face)
         }
     }
 
@@ -64,7 +66,8 @@ class DiceOrientationTest {
 
         val closest = DiceOrientation.closestResting(DieFace.FOUR, current)
 
-        assertTrue(closest.dot(current) > 0.9999f || closest.dot(current) < -0.9999f)
+        // A quaternion and its opposite describe the same rotation.
+        assertThat(abs(closest.dot(current))).isGreaterThan(0.9999f)
     }
 
     @Test
@@ -74,7 +77,13 @@ class DiceOrientationTest {
         val (axis, angle) = original.toAxisAngle()
         val rebuilt = Quaternion.fromAxisAngle(axis, angle)
 
-        assertVectorEquals(original.rotate(Vector3(1f, 0f, 0f)), rebuilt.rotate(Vector3(1f, 0f, 0f)))
-        assertVectorEquals(original.rotate(Vector3(0f, 0f, 1f)), rebuilt.rotate(Vector3(0f, 0f, 1f)))
+        assertVectorEquals(
+            rebuilt.rotate(Vector3(1f, 0f, 0f)),
+            original.rotate(Vector3(1f, 0f, 0f))
+        )
+        assertVectorEquals(
+            rebuilt.rotate(Vector3(0f, 0f, 1f)),
+            original.rotate(Vector3(0f, 0f, 1f))
+        )
     }
 }
