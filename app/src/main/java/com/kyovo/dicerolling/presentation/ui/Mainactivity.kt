@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,6 +26,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kyovo.dicerolling.application.service.ContinuousRollService
 import com.kyovo.dicerolling.application.service.RollService
 import com.kyovo.dicerolling.infrastructure.adapters.DefaultRollGenerator
+import com.kyovo.dicerolling.presentation.ui.dice.DiceView
 
 class MainActivity : ComponentActivity() {
 
@@ -61,9 +63,10 @@ fun DiceScreen(viewModel: DiceViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = currentFace?.number?.value?.toString() ?: "–",
-            style = MaterialTheme.typography.displayLarge
+        DiceView(
+            faceNumber = currentFace?.number?.value,
+            isRolling = isRolling,
+            modifier = Modifier.size(280.dp)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
