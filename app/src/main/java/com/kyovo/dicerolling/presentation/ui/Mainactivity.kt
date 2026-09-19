@@ -3,6 +3,7 @@ package com.kyovo.dicerolling.presentation.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,15 +20,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.kyovo.dicerolling.application.service.ContinuousRollService
+import com.kyovo.dicerolling.application.service.RollService
+import com.kyovo.dicerolling.infrastructure.adapters.DefaultRollGenerator
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: DiceViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                val roller = RollService(DefaultRollGenerator())
+                DiceViewModel(ContinuousRollService(roller))
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
                 Surface {
-                    DiceScreen()
+                    DiceScreen(viewModel)
                 }
             }
         }
@@ -35,7 +50,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun DiceScreen(viewModel: DiceViewModel = viewModel()) {
+fun DiceScreen(viewModel: DiceViewModel) {
     val currentFace by viewModel.currentFace.collectAsState()
     val isRolling by viewModel.isRolling.collectAsState()
 

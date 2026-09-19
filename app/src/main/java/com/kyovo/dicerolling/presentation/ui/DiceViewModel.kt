@@ -2,26 +2,19 @@ package com.kyovo.dicerolling.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kyovo.dicerolling.application.service.ContinuousRollService
-import com.kyovo.dicerolling.application.service.RollService
 import com.kyovo.dicerolling.domain.model.Face
 import com.kyovo.dicerolling.domain.model.FaceNumber
 import com.kyovo.dicerolling.domain.model.Faces
 import com.kyovo.dicerolling.domain.model.Probability
 import com.kyovo.dicerolling.domain.model.WeightedDice
 import com.kyovo.dicerolling.domain.ports.primary.ContinuousRoller
-import com.kyovo.dicerolling.domain.ports.primary.Roller
-import com.kyovo.dicerolling.infrastructure.adapters.DefaultRollGenerator
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class DiceViewModel(
-    private val roller: Roller = RollService(DefaultRollGenerator()),
-    private val continuousRoller: ContinuousRoller = ContinuousRollService(roller)
-) : ViewModel() {
+class DiceViewModel(private val continuousRoller: ContinuousRoller) : ViewModel() {
 
     private val weightedDice = WeightedDice(
         Faces(
